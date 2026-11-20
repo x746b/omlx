@@ -39,6 +39,14 @@
 
 ---
 
+## About this fork
+
+This fork maintains three model-support patches on feature branches:
+
+- **Ripple-65B Preview** adds MLX serving and oQ quantization support. [Upstream PR #5436](https://github.com/jundot/omlx/pull/5436)
+- **Ripple DFlash2** enables speculative decoding for a single request on MLX. [Upstream PR #5437](https://github.com/jundot/omlx/pull/5437)
+- **MiMo V2** streams experts from SSD so unpruned text models can run on Macs with less memory than the full checkpoint requires. MiMo V2 Flash also supports opt-in Lightning MTP for single requests. [Upstream PR #5455](https://github.com/jundot/omlx/pull/5455)
+
 <p align="center">
   <img src="docs/images/omlx_dashboard.png" alt="oMLX Admin Dashboard" width="800">
 </p>
