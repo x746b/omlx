@@ -118,6 +118,40 @@ Continuous batching, PP1024/TG128:
 
 Generation stays at 56–67 tok/s from 1K to 16K context, and peak memory grows only from 18 to 24 GB. The code context favours MTP drafting; plain chat may decode somewhat slower.
 
+### Inkling-2-Mini official release vs oQ4e (21 Nov 2026)
+
+Model `thinkingmachines/Inkling-2-Mini` (20.2 GB: the release as published, experts NVFP4 in layers 0–19 and MXFP8 in 20–23, everything else BF16, plus the DSpark draft). oMLX loads the raw ModelOpt checkpoint directly (`omlx/patches/inkling2/loader.py`). Same machine, oMLX build and benchmark settings as above.
+
+Single request:
+
+| Test | TTFT (ms) | TPOT (ms) | PP TPS | TG TPS | E2E (s) | Throughput | Peak MLX |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| PP1024/TG128 | 653.9 | 18.79 | 1566.1 | 53.7 | 3.043 | 378.6 | 21.37 GB |
+| PP4096/TG128 | 2292.7 | 16.90 | 1786.6 | 59.6 | 4.445 | 950.2 | 23.57 GB |
+| PP8192/TG128 | 4580.9 | 18.94 | 1788.3 | 53.2 | 6.993 | 1189.8 | 24.72 GB |
+| PP16384/TG128 | 9448.3 | 16.19 | 1734.1 | 62.2 | 11.510 | 1434.6 | 26.76 GB |
+
+Continuous batching, PP1024/TG128:
+
+| Batch | TG TPS | Speedup | PP TPS | PP TPS/req | TTFT (ms) | E2E (s) |
+|---|---:|---:|---:|---:|---:|---:|
+| 1x | 53.7 | 1.00x | 1566.1 | 1566.1 | 653.9 | 3.043 |
+| 2x | 59.6 | 1.11x | 1613.9 | 807.0 | 1242.7 | 5.513 |
+| 4x | 92.6 | 1.72x | 1576.7 | 394.2 | 2469.0 | 8.016 |
+
+Comparison with oQ4e (16.8 GB):
+
+| | Official release | oQ4e |
+|---|---:|---:|
+| Mean TG TPS, 4 single-request tests | 57.2 | 59.0 |
+| Mean PP TPS, 4 single-request tests | 1719 | 1711 |
+| Peak MLX, PP1024 → PP16384 | 21.4 → 26.8 GB | 18.2 → 23.6 GB |
+| 4x batch TG TPS | 92.6 | 97.4 |
+
+Prompt processing is the same; generation is about 3% slower (within run-to-run MTP variation: the official release is faster at 16K); memory is a constant ~3.2 GB higher. For about that cost the official release keeps every weight as published, so it is the default here. Both use the same chat template.
+
+`netprojects/Inkling-2-Mini-MLX-4-8bit` (a lossless repack in mlx-vlm's tensor layout) does not load in oMLX 0.8.2: the Inkling 2 loader rejects 1269 of its 1271 tensors ("parameters not in model"). It accepts the raw release and oMLX's oQ layout only.
+
 ## Development
 
 Work on the PR branches in `~/opt/omlx` as before. Run tests against a release with a temporary worktree:
