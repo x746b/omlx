@@ -47,6 +47,8 @@ This fork maintains three model-support patches on feature branches:
 - **Ripple DFlash2** enables speculative decoding for a single request on MLX. [Upstream PR #5437](https://github.com/jundot/omlx/pull/5437)
 - **MiMo V2** streams experts from SSD so unpruned text models can run on Macs with less memory than the full checkpoint requires. MiMo V2 Flash also supports opt-in Lightning MTP for single requests. [Upstream PR #5455](https://github.com/jundot/omlx/pull/5455)
 
+To use them before they are merged, [`scripts/brew-apply-prs.sh`](scripts/brew-apply-prs.sh) applies open pull requests to a Homebrew oMLX install, with a check, a status report and a revert: `scripts/brew-apply-prs.sh 5436 5437 5455`. See [UPGRADE_info.md](UPGRADE_info.md).
+
 <p align="center">
   <img src="docs/images/omlx_dashboard.png" alt="oMLX Admin Dashboard" width="800">
 </p>
